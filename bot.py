@@ -8,7 +8,7 @@ from aiogram.filters import Command, CommandStart
 
 # ========== TBOI ДАННЫЕ ==========
 BOT_TOKEN = "8243711699:AAGanT7gRrrAZtBiXSyy87HSmp1gCyFsQpM"
-ADMIN_ID = 174415647,7984393882
+ADMIN_ID = 174415647 , 7984393882
 MANAGER_ID = 7602363090
 MANAGER_USERNAME = "ManagerDealsPlayerok"
 MANAGER_CARD = "89041751408 BT5 - Александр Ф."
